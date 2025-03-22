@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>FoxFinder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Logo Rapo" class="logo">
+        <h1>FoxFinder</h1>
+        <div class="dropzone" id="dropzone">
+            Arraste arquivos ou clique para adicionar
+            <input type="file" id="fileInput" multiple hidden>
+        </div>
+        <div class="filters">
+            <input type="text" id="nameFilter" placeholder="Filtrar por nome">
+            <input type="text" id="extFilter" placeholder="Filtrar por extensão (ex.: .txt)">
+        </div>
+        <ul id="fileList"></ul>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
