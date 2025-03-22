@@ -1,0 +1,10 @@
+body { margin: 0; padding: 20px; font-family: Arial, sans-serif; background: #fff; }
+.container { max-width: 600px; margin: 0 auto; text-align: center; }
+.logo { max-width: 100px; margin-bottom: 20px; }
+h1 { color: #333; font-size: 24px; }
+.dropzone { border: 2px dashed #ccc; padding: 20px; margin: 20px 0; cursor: pointer; }
+.dropzone.dragover { background: #f5f5f5; border-color: #f28c38; }
+.filters { margin: 10px 0; }
+input { padding: 8px; margin: 5px; width: calc(50% - 20px); border: 1px solid #ccc; border-radius: 5px; }
+ul { list-style: none; padding: 0; text-align: left; }
+li { padding: 10px; background: #f9f9f9; margin: 5px 0; border-radius: 5px; }
