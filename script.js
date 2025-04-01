@@ -52,6 +52,9 @@ function filterFiles() {
         const li = document.createElement('li');
         li.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
 
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.classList.add('buttons');
+
         const downloadButton = document.createElement('button');
         downloadButton.textContent = 'Download';
         downloadButton.addEventListener('click', () => downloadFile(file));
@@ -60,8 +63,9 @@ function filterFiles() {
         deleteButton.textContent = 'Excluir';
         deleteButton.addEventListener('click', () => deleteFile(file));
 
-        li.appendChild(downloadButton);
-        li.appendChild(deleteButton);
+        buttonsDiv.appendChild(downloadButton);
+        buttonsDiv.appendChild(deleteButton);
+        li.appendChild(buttonsDiv);
         fileList.appendChild(li);
     });
 
