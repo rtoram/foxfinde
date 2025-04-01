@@ -7,12 +7,14 @@
     --secondary-light: #ffffff;
     --accent-light: #007bff;
     --text-light: #333333;
+    --folder-color: #ff6b6b; /* Cor para pastas */
 }
 
 body {
     margin: 0;
     font-family: 'Segoe UI', Arial, sans-serif;
     transition: all 0.3s ease;
+    display: flex;
 }
 
 .theme-dark {
@@ -26,10 +28,15 @@ body {
 }
 
 .futuristic-menu {
+    width: 250px;
+    height: 100vh;
     padding: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .futuristic-btn {
@@ -50,8 +57,8 @@ body {
 
 .filter-container {
     display: flex;
+    flex-direction: column;
     gap: 10px;
-    margin: 15px 0;
 }
 
 .futuristic-input {
@@ -69,8 +76,8 @@ body {
 }
 
 .futuristic-container {
-    display: flex;
-    height: calc(100vh - 150px);
+    flex: 1;
+    height: 100vh;
 }
 
 .content-wrapper {
@@ -107,10 +114,18 @@ body {
     cursor: pointer;
 }
 
+.folder-grid li {
+    background: rgba(255, 107, 107, 0.2); /* Cor diferente para pastas */
+}
+
 .file-grid li:hover, .folder-grid li:hover {
     transform: translateX(5px);
     background: rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+.folder-grid li:hover {
+    background: rgba(255, 107, 107, 0.3);
 }
 
 .buttons button {
