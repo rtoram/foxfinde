@@ -1,3 +1,4 @@
+// Elementos DOM
 const elements = {
     uploadButton: document.getElementById('uploadButton'),
     fileInput: document.getElementById('fileInput'),
@@ -21,51 +22,51 @@ const elements = {
     modalClose: document.getElementById('modalClose')
 };
 
+// Variáveis globais
 let filesArray = JSON.parse(localStorage.getItem('filesArray')) || [];
 let currentPath = [];
 let theme = localStorage.getItem('theme') || 'dark';
 let currentFileToRename = null;
 
+// Inicialização
 document.body.className = `theme-${theme}`;
 addEventListeners();
 filterFiles();
 
 function addEventListeners() {
-    elements.uploadButton.addEventListener('click', () => elements.fileInput.click());
-    elements.fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files.length > 0) {
-            handleFiles(e.target.files);
-            e.target.value = '';
-        }
-    });
-    elements.createFolderButton.addEventListener('click', showCreateFolderModal);
-    elements.toggleThemeButton.addEventListener('click', toggleTheme);
-    elements.closeViewer.addEventListener('click', closeFileViewer);
-    elements.nameFilter.addEventListener('input', filterFiles);
-    elements.extFilter.addEventListener('input', filterFiles);
-    elements.dateFilter.addEventListener('input', filterFiles);
-    
-    elements.modalClose.addEventListener('click', closeModal);
-    elements.modalCancel.addEventListener('click', closeModal);
-    elements.modalConfirm.addEventListener('click', handleModalConfirm);
-
-    elements.folderList.addEventListener('dragover', (e) => e.preventDefault());
-    elements.folderList.addEventListener('drop', handleDrop);
+    if (elements.uploadButton) elements.uploadButton.addEventListener('click', () => elements.fileInput.click());
+    if (elements.fileInput) elements.fileInput.addEventListener('change', handleFileUpload);
+    if (elements.createFolderButton) elements.createFolderButton.addEventListener('click', showCreateFolderModal);
+    if (elements.toggleThemeButton) elements.toggleThemeButton.addEventListener('click', toggleTheme);
+    if (elements.closeViewer) elements.closeViewer.addEventListener('click', closeFileViewer);
+    if (elements.nameFilter) elements.nameFilter.addEventListener('input', filterFiles);
+    if (elements.extFilter) elements.extFilter.addEventListener('input', filterFiles);
+    if (elements.dateFilter) elements.dateFilter.addEventListener('input', filterFiles);
+    if (elements.modalClose) elements.modalClose.addEventListener('click', closeModal);
+    if (elements.modalCancel) elements.modalCancel.addEventListener('click', closeModal);
+    if (elements.modalConfirm) elements.modalConfirm.addEventListener('click', handleModalConfirm);
+    if (elements.folderList) {
+        elements.folderList.addEventListener('dragover', (e) => e.preventDefault());
+        elements.folderList.addEventListener('drop', handleDrop);
+    }
 }
 
-function handleFiles(files) {
+function handleFileUpload(e) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
     const path = currentPath.join('/');
     const currentDate = new Date().toISOString().split('T')[0];
     let filesProcessed = 0;
 
     Array.from(files).forEach(file => {
         const fileReader = new FileReader();
-        fileReader.onload = (e) => {
+        fileReader.onload = (event) => {
             filesArray.push({
                 name: file.name,
                 size: file.size,
                 type: file.name.split('.').pop().toLowerCase(),
-                content: e.target.result,
+                content: event.target.result,
                 path: path,
                 date: currentDate
             });
@@ -75,22 +76,15 @@ function handleFiles(files) {
                 filterFiles();
             }
         };
-        fileReader.onerror = () => {
-            console.error(`Erro ao ler o arquivo: ${file.name}`);
-            filesProcessed++;
-            if (filesProcessed === files.length) {
-                saveFiles();
-                filterFiles();
-            }
-        };
         fileReader.readAsDataURL(file);
     });
+    e.target.value = ''; // Reset input
 }
 
 function filterFiles() {
-    const nameQuery = elements.nameFilter.value.toLowerCase();
-    const extQuery = elements.extFilter.value.toLowerCase().replace('.', '');
-    const dateQuery = elements.dateFilter.value;
+    const nameQuery = elements.nameFilter?.value.toLowerCase() || '';
+    const extQuery = elements.extFilter?.value.toLowerCase().replace('.', '') || '';
+    const dateQuery = elements.dateFilter?.value || '';
     elements.fileList.innerHTML = '';
     elements.folderList.innerHTML = '';
     updatePathDisplay();
@@ -118,7 +112,7 @@ function filterFiles() {
                 <button class="view-btn"><i class="fas fa-eye"></i></button>
             </div>
         `;
-        
+
         if (file.type === 'folder') {
             li.addEventListener('dblclick', () => navigateToFolder(file));
             elements.folderList.appendChild(li);
@@ -147,9 +141,9 @@ function downloadFile(fileName, path) {
     const a = document.createElement('a');
     a.href = file.content;
     a.download = file.name;
-    document.body.appendChild(a); // Append the element to the body
+    document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a); // Remove the element after download
+    document.body.removeChild(a);
 }
 
 function deleteFile(fileName, path) {
@@ -160,10 +154,7 @@ function deleteFile(fileName, path) {
 
 function showRenameModal(fileName, path) {
     currentFileToRename = filesArray.find(f => f.name === fileName && f.path === path);
-    if (!currentFileToRename) {
-        console.error('Arquivo não encontrado para renomear');
-        return;
-    }
+    if (!currentFileToRename) return;
     elements.modalTitle.textContent = 'Renomear Arquivo';
     elements.modalInput.value = currentFileToRename.name;
     elements.modal.style.display = 'block';
@@ -245,9 +236,9 @@ function toggleTheme() {
 }
 
 function updatePathDisplay() {
-    elements.currentPathSpan.innerHTML = currentPath.map(p => 
-        `<span>${p}</span>`
-    ).join(' / ');
+    if (elements.currentPathSpan) {
+        elements.currentPathSpan.innerHTML = currentPath.map(p => `<span>${p}</span>`).join(' / ');
+    }
 }
 
 function handleDrop(e) {
