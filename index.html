@@ -4,12 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XperiArquivos</title>
+    <style>
+        /* Adicionar estilos básicos */
+        #dropzone {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .dragover {
+            border-color: #000;
+        }
+        #fileList li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .folder {
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
+    <h1>XperiArquivos</h1>
     <div id="dropzone">Arraste e solte arquivos aqui ou clique para selecionar</div>
     <input type="file" id="fileInput" multiple style="display:none">
     <input type="text" id="nameFilter" placeholder="Filtrar por nome">
     <input type="text" id="extFilter" placeholder="Filtrar por extensão">
+    <button id="createFolder">Criar Pasta</button>
     <ul id="fileList"></ul>
 </body>
 </html>
