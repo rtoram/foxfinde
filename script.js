@@ -1,172 +1,179 @@
-:root {
-    --primary-dark: #1a1a1a;
-    --secondary-dark: #2d2d2d;
-    --accent-dark: #4a90e2;
-    --text-dark: #ffffff;
-    --primary-light: #ffffff;
-    --secondary-light: #f5f5f5;
-    --accent-light: #4a90e2;
-    --text-light: #333333;
+const elements = {
+    uploadButton: document.getElementById('uploadButton'),
+    fileInput: document.getElementById('fileInput'),
+    fileList: document.getElementById('fileList'),
+    nameFilter: document.getElementById('nameFilter'),
+    extFilter: document.getElementById('extFilter'),
+    dateFilter: document.getElementById('dateFilter'),
+    createFolderButton: document.getElementById('createFolder'),
+    toggleThemeButton: document.getElementById('toggleTheme'),
+    viewer: document.getElementById('viewer'),
+    imageView: document.getElementById('imageView'),
+    docView: document.getElementById('docView'),
+    closeViewer: document.getElementById('closeViewer'),
+    currentPathSpan: document.getElementById('currentPath')
+};
+
+let filesArray = JSON.parse(localStorage.getItem('filesArray')) || [];
+let currentPath = [];
+let theme = localStorage.getItem('theme') || 'dark';
+
+document.body.className = `theme-${theme}`;
+addEventListeners();
+filterFiles();
+
+function addEventListeners() {
+    elements.uploadButton.addEventListener('click', () => elements.fileInput.click());
+    elements.fileInput.addEventListener('change', () => handleFiles(elements.fileInput.files));
+    elements.createFolderButton.addEventListener('click', createFolder);
+    elements.closeViewer.addEventListener('click', closeFileViewer);
+    elements.toggleThemeButton.addEventListener('click', toggleTheme);
+    elements.nameFilter.addEventListener('input', filterFiles);
+    elements.extFilter.addEventListener('input', filterFiles);
+    elements.dateFilter.addEventListener('input', filterFiles);
 }
 
-body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    transition: all 0.3s ease;
+function handleFiles(files) {
+    const path = currentPath.join('/');
+    const currentDate = new Date().toISOString().split('T')[0];
+    
+    Array.from(files).forEach(file => {
+        filesArray.push({
+            name: file.name,
+            size: file.size,
+            type: file.name.split('.').pop().toLowerCase(),
+            content: file,
+            path: path,
+            date: currentDate
+        });
+    });
+    saveFiles();
+    filterFiles();
 }
 
-body.theme-dark {
-    background-color: var(--primary-dark);
-    color: var(--text-dark);
+function filterFiles() {
+    const nameQuery = elements.nameFilter.value.toLowerCase();
+    const extQuery = elements.extFilter.value.toLowerCase().replace('.', '');
+    const dateQuery = elements.dateFilter.value;
+    elements.fileList.innerHTML = '';
+    updatePathDisplay();
+
+    const currentFolder = currentPath.join('/');
+    const filtered = filesArray.filter(file => 
+        file.name.toLowerCase().includes(nameQuery) &&
+        (extQuery === '' || file.type === extQuery) &&
+        file.path === currentFolder &&
+        (dateQuery === '' || file.date === dateQuery)
+    );
+
+    filtered.forEach(file => {
+        const li = document.createElement('li');
+        li.className = file.type === 'folder' ? 'folder' : 'file';
+        li.innerHTML = `
+            <span>${file.name} (${(file.size / 1024).toFixed(2)} KB) - ${file.date}</span>
+            <div class="buttons">
+                <button onclick="downloadFile('${file.name}')"><i class="fas fa-download"></i></button>
+                <button onclick="deleteFile('${file.name}')"><i class="fas fa-trash"></i></button>
+                <button onclick="renameFile('${file.name}')"><i class="fas fa-edit"></i></button>
+                <button onclick="viewFile('${file.name}')"><i class="fas fa-eye"></i></button>
+            </div>
+        `;
+        if (file.type === 'folder') {
+            li.addEventListener('dblclick', () => navigateToFolder(file));
+        }
+        elements.fileList.appendChild(li);
+    });
 }
 
-body.theme-light {
-    background-color: var(--primary-light);
-    color: var(--text-light);
+function saveFiles() {
+    localStorage.setItem('filesArray', JSON.stringify(filesArray));
 }
 
-#menu {
-    width: 250px;
-    height: 100vh;
-    position: fixed;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+function downloadFile(fileName) {
+    const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
+    if (!file.content) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file.content);
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 
-.theme-dark #menu { background-color: var(--secondary-dark); }
-.theme-light #menu { background-color: var(--secondary-light); }
-
-#menu h1 {
-    margin: 0 0 20px;
-    font-size: 1.5em;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+function deleteFile(fileName) {
+    filesArray = filesArray.filter(f => !(f.name === fileName && f.path === currentPath.join('/')));
+    saveFiles();
+    filterFiles();
 }
 
-#menu button, #menu input {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    border: none;
-    border-radius: 5px;
-    font-size: 1em;
-    cursor: pointer;
-    transition: all 0.3s ease;
+function renameFile(fileName) {
+    const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
+    const newName = prompt('Novo nome:', file.name);
+    if (newName) {
+        file.name = newName;
+        saveFiles();
+        filterFiles();
+    }
 }
 
-.theme-dark #menu button { 
-    background-color: var(--accent-dark);
-    color: white;
+function createFolder() {
+    const folderName = prompt('Nome da nova pasta:');
+    if (folderName) {
+        const path = currentPath.join('/');
+        filesArray.push({
+            name: folderName,
+            type: 'folder',
+            path: path,
+            date: new Date().toISOString().split('T')[0],
+            size: 0
+        });
+        saveFiles();
+        filterFiles();
+    }
 }
 
-.theme-dark #menu input {
-    background-color: #333;
-    color: white;
+function navigateToFolder(folder) {
+    currentPath.push(folder.name);
+    filterFiles();
 }
 
-.theme-light #menu button {
-    background-color: var(--accent-light);
-    color: white;
+function navigateToRoot() {
+    currentPath = [];
+    filterFiles();
 }
 
-.theme-light #menu input {
-    background-color: #eee;
-    color: #333;
+function viewFile(fileName) {
+    const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
+    if (!file.content) return;
+    
+    elements.viewer.style.display = 'flex';
+    const fileType = file.type.toLowerCase();
+
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+        elements.imageView.src = URL.createObjectURL(file.content);
+        elements.imageView.style.display = 'block';
+        elements.docView.style.display = 'none';
+    } else if (['pdf', 'txt', 'doc', 'docx'].includes(fileType)) {
+        elements.docView.src = URL.createObjectURL(file.content);
+        elements.docView.style.display = 'block';
+        elements.imageView.style.display = 'none';
+    }
 }
 
-#menu button:hover {
-    opacity: 0.9;
+function closeFileViewer() {
+    elements.viewer.style.display = 'none';
+    elements.imageView.style.display = 'none';
+    elements.docView.style.display = 'none';
 }
 
-#main-content {
-    margin-left: 270px;
-    padding: 20px;
+function toggleTheme() {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('theme', theme);
+    document.body.className = `theme-${theme}`;
 }
 
-.path-breadcrumbs {
-    margin-bottom: 15px;
-    font-size: 0.9em;
-    opacity: 0.8;
-    cursor: pointer;
-}
-
-.path-breadcrumbs span:hover {
-    text-decoration: underline;
-}
-
-#fileList {
-    list-style: none;
-    padding: 0;
-    display: grid;
-    gap: 10px;
-}
-
-#fileList li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.theme-dark #fileList li {
-    background-color: var(--secondary-dark);
-    border: 1px solid #444;
-}
-
-.theme-light #fileList li {
-    background-color: var(--secondary-light);
-    border: 1px solid #ddd;
-}
-
-#fileList li:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.folder { 
-    font-weight: 600;
-    color: var(--accent-dark);
-}
-
-.folder::before {
-    content: '📁 ';
-    margin-right: 5px;
-}
-
-.buttons button {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: var(--accent-dark);
-    color: white;
-    transition: all 0.3s ease;
-}
-
-.buttons button:hover {
-    opacity: 0.9;
-}
-
-#viewer {
-    display: none;
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 50%;
-    height: 100vh;
-    background-color: rgba(0,0,0,0.9);
-    padding: 20px;
-    flex-direction: column;
-    align-items: center;
-}
-
-#closeViewer {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #e74c3c;
+function updatePathDisplay() {
+    elements.currentPathSpan.innerHTML = currentPath.map(p => 
+        `<span>${p}</span>`
+    ).join(' / ');
 }
