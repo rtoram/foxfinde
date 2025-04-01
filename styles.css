@@ -6,8 +6,8 @@
     --primary-light: #e6f3ff;
     --secondary-light: #ffffff;
     --accent-light: #007bff;
-    --text-light: #333333;
-    --folder-color: #ff6b6b; /* Cor para pastas */
+    --text-light: #ffeb3b; /* Amarelo para tema claro */
+    --folder-color: #ff6b6b;
 }
 
 body {
@@ -47,7 +47,6 @@ body {
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
 }
 
 .futuristic-btn:hover {
@@ -55,7 +54,7 @@ body {
     box-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
 }
 
-.filter-container {
+.search-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -67,12 +66,12 @@ body {
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.1);
     color: white;
-    transition: all 0.3s ease;
+    width: 100%;
 }
 
-.futuristic-input:focus {
-    outline: none;
-    box-shadow: 0 0 10px var(--accent-dark);
+.theme-light .futuristic-input {
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--text-light);
 }
 
 .futuristic-container {
@@ -95,40 +94,27 @@ body {
     flex: 1;
 }
 
-.file-grid li {
+.file-grid li, .folder-grid li {
     padding: 15px;
     margin: 10px 0;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    cursor: pointer;
 }
 
 .folder-grid li {
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 10px;
     background: rgba(255, 107, 107, 0.2);
-    transition: all 0.3s ease;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
 }
 
-.file-grid li:hover {
-    transform: translateX(5px);
+.file-grid li:hover, .folder-grid li:hover {
     background: rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
 }
 
 .folder-grid li:hover {
-    transform: translateX(5px);
     background: rgba(255, 107, 107, 0.3);
-    box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
 }
 
 .buttons button {
@@ -138,6 +124,10 @@ body {
     padding: 5px;
     cursor: pointer;
     transition: all 0.3s ease;
+}
+
+.theme-light .buttons button {
+    color: var(--accent-light);
 }
 
 .buttons button:hover {
@@ -150,6 +140,10 @@ body {
     background: rgba(0, 0, 0, 0.2);
 }
 
+.theme-light .futuristic-breadcrumbs {
+    background: rgba(0, 0, 0, 0.1);
+}
+
 .futuristic-breadcrumbs span {
     cursor: pointer;
     padding: 5px 10px;
@@ -158,6 +152,49 @@ body {
 
 .futuristic-breadcrumbs span:hover {
     background: var(--accent-dark);
+}
+
+.theme-light .futuristic-breadcrumbs span:hover {
+    background: var(--accent-light);
+}
+
+.futuristic-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--secondary-dark);
+    padding: 30px;
+    border-radius: 15px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 400px;
+    width: 100%;
+}
+
+.theme-light .modal-content {
+    background: var(--secondary-light);
+    color: var(--text-light);
+}
+
+.modal-close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+    color: #e74c3c;
+}
+
+.modal-close:hover {
+    color: #c0392b;
 }
 
 .futuristic-viewer {
@@ -180,24 +217,8 @@ body {
     box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
 }
 
-.futuristic-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-}
-
-.modal-content {
-    background: var(--secondary-dark);
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
 }
