@@ -4,54 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XperiArquivos</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        h1 {
-            text-align: center;
-        }
-        #dropzone {
-            border: 2px dashed #ccc;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            background-color: #fff;
-            cursor: pointer;
-        }
-        .dragover {
-            border-color: #000;
-        }
-        #fileList li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-        }
-        #fileList li .buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .folder {
-            font-weight: bold;
-            cursor: pointer;
-        }
-        #controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        #controls input, #controls button {
-            padding: 10px;
-            font-size: 16px;
-        }
-    </style>
+    <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
     <h1>XperiArquivos</h1>
@@ -63,5 +16,6 @@
         <button id="createFolder">Criar Pasta</button>
     </div>
     <ul id="fileList"></ul>
+    <script src="script.js"></script>
 </body>
 </html>
