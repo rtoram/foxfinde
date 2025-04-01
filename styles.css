@@ -1,93 +1,187 @@
-/* ... (manter os estilos anteriores) ... */
+:root {
+    --primary-dark: #0a0f2b;
+    --secondary-dark: #1a2356;
+    --accent-dark: #00d4ff;
+    --text-dark: #ffffff;
+    --primary-light: #e6f3ff;
+    --secondary-light: #ffffff;
+    --accent-light: #007bff;
+    --text-light: #333333;
+}
 
-/* Modal Styles */
-.modal {
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    transition: all 0.3s ease;
+}
+
+.theme-dark {
+    background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
+    color: var(--text-dark);
+}
+
+.theme-light {
+    background: linear-gradient(135deg, var(--primary-light), var(--secondary-light));
+    color: var(--text-light);
+}
+
+.futuristic-menu {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.futuristic-btn {
+    padding: 10px 20px;
+    background: var(--accent-dark);
+    border: none;
+    border-radius: 25px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.futuristic-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+}
+
+.filter-container {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.futuristic-input {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.futuristic-input:focus {
+    outline: none;
+    box-shadow: 0 0 10px var(--accent-dark);
+}
+
+.futuristic-container {
+    display: flex;
+    height: calc(100vh - 150px);
+}
+
+.content-wrapper {
+    display: flex;
+    width: 100%;
+    padding: 20px;
+    gap: 20px;
+}
+
+.file-grid, .folder-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.file-grid {
+    flex: 1;
+}
+
+.folder-grid {
+    flex: 1;
+    order: 2;
+}
+
+.file-grid li, .folder-grid li {
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.file-grid li:hover, .folder-grid li:hover {
+    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+.buttons button {
+    background: none;
+    border: none;
+    color: var(--accent-dark);
+    padding: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.buttons button:hover {
+    color: white;
+    transform: scale(1.2);
+}
+
+.futuristic-breadcrumbs {
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.futuristic-breadcrumbs span {
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 15px;
+}
+
+.futuristic-breadcrumbs span:hover {
+    background: var(--accent-dark);
+}
+
+.futuristic-viewer {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.9);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.futuristic-viewer img, .futuristic-viewer iframe {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+}
+
+.futuristic-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
     z-index: 1000;
 }
 
 .modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    background: var(--secondary-dark);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+    transform: translate(-50%, -50%) scale(0.9);
     transition: all 0.3s ease;
 }
 
-.theme-dark .modal-content {
-    background-color: var(--secondary-dark);
-    color: var(--text-dark);
-}
-
-.theme-light .modal-content {
-    background-color: var(--secondary-light);
-    color: var(--text-light);
-}
-
-.modal-close {
-    float: right;
-    font-size: 24px;
-    cursor: pointer;
-    color: #e74c3c;
-}
-
-.modal-close:hover {
-    color: #c0392b;
-}
-
-#modalInput {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 5px;
-}
-
-.theme-dark #modalInput {
-    background-color: #333;
-    color: white;
-}
-
-.theme-light #modalInput {
-    background-color: #eee;
-    color: #333;
-}
-
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 15px;
-}
-
-.modal-buttons button {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-#modalConfirm {
-    background-color: var(--accent-dark);
-    color: white;
-}
-
-#modalCancel {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.modal-buttons button:hover {
-    opacity: 0.9;
+.futuristic-modal[style*="block"] .modal-content {
+    transform: translate(-50%, -50%) scale(1);
 }
