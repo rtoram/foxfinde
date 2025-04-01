@@ -1,32 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XperiArquivos</title>
-    <link rel="stylesheet" href="estilos.css">
+    <title>Gerenciador de Arquivos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="theme-dark">
+<body>
     <div id="menu">
-        <h1>XperiArquivos</h1>
-        <button id="uploadButton">Carregar Arquivos</button>
-        <input type="file" id="fileInput" multiple style="display:none">
+        <h1><i class="fas fa-folder-open"></i> Arquivos</h1>
+        <button id="uploadButton"><i class="fas fa-upload"></i> Upload</button>
+        <input type="file" id="fileInput" multiple style="display: none;">
+        <button id="createFolder"><i class="fas fa-folder-plus"></i> Nova Pasta</button>
         <input type="text" id="nameFilter" placeholder="Filtrar por nome">
-        <input type="text" id="extFilter" placeholder="Filtrar por extensão">
-        <input type="date" id="dateFilter" placeholder="Filtrar por data">
-        <button id="createFolder">Criar Pasta</button>
-        <button id="toggleTheme">Trocar Tema</button>
+        <input type="text" id="extFilter" placeholder="Filtrar por extensão (ex: .pdf)">
+        <input type="date" id="dateFilter">
+        <button id="toggleTheme"><i class="fas fa-adjust"></i> Tema</button>
     </div>
+
     <div id="main-content">
         <div id="fileListContainer">
+            <div class="path-breadcrumbs">
+                <span onclick="navigateToRoot()">Raiz</span>
+                <span id="currentPath"></span>
+            </div>
             <ul id="fileList"></ul>
         </div>
-        <div id="viewer" style="display:none;">
-            <button id="closeViewer">Fechar</button>
-            <img id="imageView" style="display:none;" />
-            <iframe id="docView" style="display:none;"></iframe>
+        
+        <div id="viewer">
+            <button id="closeViewer"><i class="fas fa-times"></i></button>
+            <img id="imageView" style="display: none;">
+            <iframe id="docView" style="display: none;"></iframe>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
