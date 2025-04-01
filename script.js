@@ -11,12 +11,19 @@ const elements = {
     imageView: document.getElementById('imageView'),
     docView: document.getElementById('docView'),
     closeViewer: document.getElementById('closeViewer'),
-    currentPathSpan: document.getElementById('currentPath')
+    currentPathSpan: document.getElementById('currentPath'),
+    modal: document.getElementById('modal'),
+    modalTitle: document.getElementById('modalTitle'),
+    modalInput: document.getElementById('modalInput'),
+    modalConfirm: document.getElementById('modalConfirm'),
+    modalCancel: document.getElementById('modalCancel'),
+    modalClose: document.getElementById('modalClose')
 };
 
 let filesArray = JSON.parse(localStorage.getItem('filesArray')) || [];
 let currentPath = [];
 let theme = localStorage.getItem('theme') || 'dark';
+let currentFileToRename = null;
 
 document.body.className = `theme-${theme}`;
 addEventListeners();
@@ -25,12 +32,17 @@ filterFiles();
 function addEventListeners() {
     elements.uploadButton.addEventListener('click', () => elements.fileInput.click());
     elements.fileInput.addEventListener('change', () => handleFiles(elements.fileInput.files));
-    elements.createFolderButton.addEventListener('click', createFolder);
+    elements.createFolderButton.addEventListener('click', showCreateFolderModal);
     elements.closeViewer.addEventListener('click', closeFileViewer);
     elements.toggleThemeButton.addEventListener('click', toggleTheme);
     elements.nameFilter.addEventListener('input', filterFiles);
     elements.extFilter.addEventListener('input', filterFiles);
     elements.dateFilter.addEventListener('input', filterFiles);
+    
+    // Modal Listeners
+    elements.modalClose.addEventListener('click', closeModal);
+    elements.modalCancel.addEventListener('click', closeModal);
+    elements.modalConfirm.addEventListener('click', handleModalConfirm);
 }
 
 function handleFiles(files) {
@@ -74,7 +86,7 @@ function filterFiles() {
             <div class="buttons">
                 <button onclick="downloadFile('${file.name}')"><i class="fas fa-download"></i></button>
                 <button onclick="deleteFile('${file.name}')"><i class="fas fa-trash"></i></button>
-                <button onclick="renameFile('${file.name}')"><i class="fas fa-edit"></i></button>
+                <button onclick="showRenameModal('${file.name}')"><i class="fas fa-edit"></i></button>
                 <button onclick="viewFile('${file.name}')"><i class="fas fa-eye"></i></button>
             </div>
         `;
@@ -106,30 +118,48 @@ function deleteFile(fileName) {
     filterFiles();
 }
 
-function renameFile(fileName) {
-    const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
-    const newName = prompt('Novo nome:', file.name);
-    if (newName) {
-        file.name = newName;
-        saveFiles();
-        filterFiles();
-    }
+function showRenameModal(fileName) {
+    currentFileToRename = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
+    elements.modalTitle.textContent = 'Renomear Arquivo';
+    elements.modalInput.value = currentFileToRename.name;
+    elements.modal.style.display = 'block';
 }
 
-function createFolder() {
-    const folderName = prompt('Nome da nova pasta:');
-    if (folderName) {
+function showCreateFolderModal() {
+    currentFileToRename = null;
+    elements.modalTitle.textContent = 'Nova Pasta';
+    elements.modalInput.value = '';
+    elements.modal.style.display = 'block';
+}
+
+function handleModalConfirm() {
+    const newName = elements.modalInput.value.trim();
+    if (!newName) return;
+
+    if (currentFileToRename) {
+        // Renomear arquivo
+        currentFileToRename.name = newName;
+    } else {
+        // Criar nova pasta
         const path = currentPath.join('/');
         filesArray.push({
-            name: folderName,
+            name: newName,
             type: 'folder',
             path: path,
             date: new Date().toISOString().split('T')[0],
             size: 0
         });
-        saveFiles();
-        filterFiles();
     }
+    
+    saveFiles();
+    filterFiles();
+    closeModal();
+}
+
+function closeModal() {
+    elements.modal.style.display = 'none';
+    elements.modalInput.value = '';
+    currentFileToRename = null;
 }
 
 function navigateToFolder(folder) {
