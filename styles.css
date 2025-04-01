@@ -9,18 +9,12 @@ h1 {
     text-align: center;
 }
 
-#dropzone {
-    border: 2px dashed #ccc;
-    padding: 20px;
-    text-align: center;
-    margin-bottom: 20px;
-    background-color: #fff;
+#uploadButton {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 16px;
     cursor: pointer;
-    transition: border-color 0.3s ease;
-}
-
-#dropzone.dragover {
-    border-color: #000;
 }
 
 #controls {
@@ -55,6 +49,24 @@ h1 {
     background-color: #f0f0f0;
 }
 
+.file {
+    color: #000;
+}
+
+.folder {
+    font-weight: bold;
+    cursor: pointer;
+    color: #007bff;
+}
+
+.folder::before {
+    content: '📁 ';
+}
+
+.folder:hover {
+    text-decoration: underline;
+}
+
 .buttons {
     display: flex;
     gap: 10px;
@@ -71,14 +83,4 @@ h1 {
 
 .buttons button:hover {
     background-color: #ddd;
-}
-
-.folder {
-    font-weight: bold;
-    cursor: pointer;
-    color: #007bff;
-}
-
-.folder:hover {
-    text-decoration: underline;
 }
