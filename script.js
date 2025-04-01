@@ -1,5 +1,5 @@
 const elements = {
-    uploadButton: document.getElementById('uploadButton'),
+    uploadButton: document.getElementBy schedaId('uploadButton'),
     fileInput: document.getElementById('fileInput'),
     fileList: document.getElementById('fileList'),
     folderList: document.getElementById('folderList'),
@@ -112,10 +112,10 @@ function filterFiles() {
         li.innerHTML = `
             <span>${file.name} (${(file.size / 1024).toFixed(2)} KB) - ${file.date}</span>
             <div class="buttons">
-                <button class="download-btn" data-name="${file.name}" data-path="${file.path}"><i class="fas fa-download"></i></button>
-                <button class="delete-btn" data-name="${file.name}" data-path="${file.path}"><i class="fas fa-trash"></i></button>
-                <button class="rename-btn" data-name="${file.name}" data-path="${file.path}"><i class="fas fa-edit"></i></button>
-                <button class="view-btn" data-name="${file.name}" data-path="${file.path}"><i class="fas fa-eye"></i></button>
+                <button class="download-btn"><i class="fas fa-download"></i></button>
+                <button class="delete-btn"><i class="fas fa-trash"></i></button>
+                <button class="rename-btn"><i class="fas fa-edit"></i></button>
+                <button class="view-btn"><i class="fas fa-eye"></i></button>
             </div>
         `;
         
@@ -147,7 +147,6 @@ function downloadFile(fileName, path) {
     const a = document.createElement('a');
     a.href = file.content;
     a.download = file.name;
-    document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
 }
@@ -160,7 +159,10 @@ function deleteFile(fileName, path) {
 
 function showRenameModal(fileName, path) {
     currentFileToRename = filesArray.find(f => f.name === fileName && f.path === path);
-    if (!currentFileToRename) return;
+    if (!currentFileToRename) {
+        console.error('Arquivo não encontrado para renomear');
+        return;
+    }
     elements.modalTitle.textContent = 'Renomear Arquivo';
     elements.modalInput.value = currentFileToRename.name;
     elements.modal.style.display = 'block';
