@@ -5,7 +5,7 @@ const nameFilter = document.getElementById('nameFilter');
 const extFilter = document.getElementById('extFilter');
 const createFolderButton = document.getElementById('createFolder');
 
-let filesArray = [];
+let filesArray = JSON.parse(localStorage.getItem('filesArray')) || [];
 let currentPath = [];
 
 uploadButton.addEventListener('click', () => fileInput.click());
@@ -23,6 +23,7 @@ function handleFiles(files) {
             path: path
         });
     });
+    saveFiles();
     filterFiles();
 }
 
@@ -63,20 +64,15 @@ function filterFiles() {
         buttonsDiv.appendChild(renameButton);
         li.appendChild(buttonsDiv);
         fileList.appendChild(li);
-    });
 
-    // Adicionar pastas
-    const folders = filesArray
-        .filter(file => file.type === 'folder' && file.path === currentFolder)
-        .map(file => file.name);
-    
-    folders.forEach(folder => {
-        const li = document.createElement('li');
-        li.textContent = folder;
-        li.classList.add('folder');
-        li.addEventListener('click', () => navigateToFolder(folder));
-        fileList.appendChild(li);
+        if (file.type === 'folder') {
+            li.addEventListener('click', () => navigateToFolder(file));
+        }
     });
+}
+
+function saveFiles() {
+    localStorage.setItem('filesArray', JSON.stringify(filesArray));
 }
 
 function downloadFile(file) {
@@ -90,6 +86,7 @@ function downloadFile(file) {
 
 function deleteFile(file) {
     filesArray = filesArray.filter(f => f !== file);
+    saveFiles();
     filterFiles();
 }
 
@@ -97,6 +94,7 @@ function renameFile(file) {
     const newName = prompt('Novo nome:', file.name);
     if (newName) {
         file.name = newName;
+        saveFiles();
         filterFiles();
     }
 }
@@ -110,14 +108,16 @@ function createFolder() {
             type: 'folder',
             path: path
         });
+        saveFiles();
         filterFiles();
     }
 }
 
 function navigateToFolder(folder) {
-    currentPath.push(folder);
+    currentPath.push(folder.name);
     filterFiles();
 }
 
 nameFilter.addEventListener('input', filterFiles);
 extFilter.addEventListener('input', filterFiles);
+window.addEventListener('load', filterFiles);
