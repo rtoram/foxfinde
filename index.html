@@ -6,22 +6,26 @@
     <title>XperiArquivos</title>
     <link rel="stylesheet" href="estilos.css">
 </head>
-<body>
-    <h1>XperiArquivos</h1>
-    <button id="uploadButton">Upload Arquivos</button>
-    <input type="file" id="fileInput" multiple style="display:none">
-    <div id="controls">
+<body class="theme-dark">
+    <div id="menu">
+        <h1>XperiArquivos</h1>
+        <button id="uploadButton">Carregar Arquivos</button>
+        <input type="file" id="fileInput" multiple style="display:none">
         <input type="text" id="nameFilter" placeholder="Filtrar por nome">
         <input type="text" id="extFilter" placeholder="Filtrar por extensão">
+        <input type="date" id="dateFilter" placeholder="Filtrar por data">
         <button id="createFolder">Criar Pasta</button>
+        <button id="toggleTheme">Trocar Tema</button>
     </div>
-    <div id="boxes">
-        <ul id="fileList"></ul>
-    </div>
-    <div id="viewer" style="display:none;">
-        <button id="closeViewer">Fechar</button>
-        <img id="imageView" style="display:none;" />
-        <iframe id="docView" style="display:none;"></iframe>
+    <div id="main-content">
+        <div id="fileListContainer">
+            <ul id="fileList"></ul>
+        </div>
+        <div id="viewer" style="display:none;">
+            <button id="closeViewer">Fechar</button>
+            <img id="imageView" style="display:none;" />
+            <iframe id="docView" style="display:none;"></iframe>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
