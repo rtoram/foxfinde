@@ -1,119 +1,84 @@
-const dropzone = document.getElementById('dropzone');
-const fileInput = document.getElementById('fileInput');
-const fileList = document.getElementById('fileList');
-const nameFilter = document.getElementById('nameFilter');
-const extFilter = document.getElementById('extFilter');
-const createFolderButton = document.getElementById('createFolder');
-
-let filesArray = [];
-let currentPath = [];
-
-dropzone.addEventListener('click', () => fileInput.click());
-dropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropzone.classList.add('dragover');
-});
-dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
-dropzone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropzone.classList.remove('dragover');
-    handleFiles(e.dataTransfer.files);
-});
-fileInput.addEventListener('change', () => handleFiles(fileInput.files));
-createFolderButton.addEventListener('click', createFolder);
-
-function handleFiles(files) {
-    const path = currentPath.join('/');
-    Array.from(files).forEach(file => {
-        filesArray.push({
-            name: file.name,
-            size: file.size,
-            type: file.name.split('.').pop().toLowerCase(),
-            content: file,
-            path: path
-        });
-    });
-    filterFiles();
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
 }
 
-function filterFiles() {
-    const nameQuery = nameFilter.value.toLowerCase();
-    const extQuery = extFilter.value.toLowerCase();
-    fileList.innerHTML = '';
-
-    const currentFolder = currentPath.join('/');
-    const filtered = filesArray.filter(file => 
-        file.name.toLowerCase().includes(nameQuery) &&
-        (extQuery === '' || file.type === extQuery.replace('.', '')) &&
-        file.path === currentFolder
-    );
-
-    filtered.forEach(file => {
-        const li = document.createElement('li');
-        li.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
-
-        const buttonsDiv = document.createElement('div');
-        buttonsDiv.classList.add('buttons');
-
-        const downloadButton = document.createElement('button');
-        downloadButton.textContent = 'Download';
-        downloadButton.addEventListener('click', () => downloadFile(file));
-
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Excluir';
-        deleteButton.addEventListener('click', () => deleteFile(file));
-
-        buttonsDiv.appendChild(downloadButton);
-        buttonsDiv.appendChild(deleteButton);
-        li.appendChild(buttonsDiv);
-        fileList.appendChild(li);
-    });
-
-    // Adicionar pastas
-    const folders = filesArray
-        .filter(file => file.type === 'folder' && file.path === currentFolder)
-        .map(file => file.name);
-    
-    folders.forEach(folder => {
-        const li = document.createElement('li');
-        li.textContent = folder;
-        li.classList.add('folder');
-        li.addEventListener('click', () => navigateToFolder(folder));
-        fileList.appendChild(li);
-    });
+h1 {
+    text-align: center;
 }
 
-function downloadFile(file) {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(file.content);
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+#dropzone {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
 }
 
-function deleteFile(file) {
-    filesArray = filesArray.filter(f => f !== file);
-    filterFiles();
+#dropzone.dragover {
+    border-color: #000;
 }
 
-function createFolder() {
-    const folderName = prompt('Nome da nova pasta:');
-    if (folderName) {
-        const path = currentPath.join('/');
-        filesArray.push({
-            name: folderName,
-            type: 'folder',
-            path: path
-        });
-        filterFiles();
-    }
+#controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
-function navigateToFolder(folder) {
-    currentPath.push(folder);
-    filterFiles();
+#controls input, #controls button {
+    padding: 10px;
+    font-size: 16px;
 }
 
-nameFilter.addEventListener('input', filterFiles);
-extFilter.addEventListener('input', filterFiles);
+#fileList {
+    list-style-type: none;
+    padding: 0;
+}
+
+#fileList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+#fileList li:hover {
+    background-color: #f0f0f0;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.buttons button {
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+
+.buttons button:hover {
+    background-color: #ddd;
+}
+
+.folder {
+    font-weight: bold;
+    cursor: pointer;
+    color: #007bff;
+}
+
+.folder:hover {
+    text-decoration: underline;
+}
