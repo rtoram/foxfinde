@@ -1,5 +1,4 @@
 const uploadButton = document.getElementById('uploadButton');
-const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
 const fileList = document.getElementById('fileList');
 const nameFilter = document.getElementById('nameFilter');
@@ -48,15 +47,20 @@ function filterFiles() {
         buttonsDiv.classList.add('buttons');
 
         const downloadButton = document.createElement('button');
-        downloadButton.innerHTML = '⬇️';
+        downloadButton.innerHTML = 'D';
         downloadButton.addEventListener('click', () => downloadFile(file));
 
         const deleteButton = document.createElement('button');
         deleteButton.innerHTML = '❌';
         deleteButton.addEventListener('click', () => deleteFile(file));
 
+        const renameButton = document.createElement('button');
+        renameButton.innerHTML = '✏️';
+        renameButton.addEventListener('click', () => renameFile(file));
+
         buttonsDiv.appendChild(downloadButton);
         buttonsDiv.appendChild(deleteButton);
+        buttonsDiv.appendChild(renameButton);
         li.appendChild(buttonsDiv);
         fileList.appendChild(li);
     });
@@ -87,6 +91,14 @@ function downloadFile(file) {
 function deleteFile(file) {
     filesArray = filesArray.filter(f => f !== file);
     filterFiles();
+}
+
+function renameFile(file) {
+    const newName = prompt('Novo nome:', file.name);
+    if (newName) {
+        file.name = newName;
+        filterFiles();
+    }
 }
 
 function createFolder() {
