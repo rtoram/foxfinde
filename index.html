@@ -7,24 +7,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="theme-dark">
     <div id="menu" class="futuristic-menu">
         <h1><i class="fas fa-folder-open"></i> Arquivos</h1>
-        <button id="uploadButton" class="futuristic-btn"><i class="fas fa-upload"></i> Upload</button>
+        <button id="uploadButton" class="futuristic-btn" title="Fazer upload de arquivos"><i class="fas fa-upload"></i> Upload</button>
         <input type="file" id="fileInput" multiple style="display: none;">
-        <button id="createFolder" class="futuristic-btn"><i class="fas fa-folder-plus"></i> Nova Pasta</button>
-        <div class="filter-container">
-            <input type="text" id="nameFilter" class="futuristic-input" placeholder="Filtrar por nome">
-            <input type="text" id="extFilter" class="futuristic-input" placeholder="Filtrar por extensão (ex: .pdf)">
-            <input type="date" id="dateFilter" class="futuristic-input">
+        <button id="createFolder" class="futuristic-btn" title="Criar nova pasta"><i class="fas fa-folder-plus"></i> Nova Pasta</button>
+        <button id="toggleTheme" class="futuristic-btn" title="Alternar entre tema claro e escuro"><i class="fas fa-adjust"></i> Tema</button>
+        <button id="helpButton" class="futuristic-btn" title="Ver instruções de uso"><i class="fas fa-question"></i> Ajuda</button>
+        <div class="search-container">
+            <input type="text" id="searchInput" class="futuristic-input" placeholder="Buscar por nome...">
+            <select id="sortSelect" class="futuristic-input">
+                <option value="name-asc">Nome (A-Z)</option>
+                <option value="name-desc">Nome (Z-A)</option>
+                <option value="date-asc">Mais velho</option>
+                <option value="date-desc">Mais novo</option>
+            </select>
         </div>
-        <button id="toggleTheme" class="futuristic-btn"><i class="fas fa-adjust"></i> Tema</button>
     </div>
 
     <div id="main-content" class="futuristic-container">
         <div id="fileListContainer">
             <div class="path-breadcrumbs futuristic-breadcrumbs">
-                <span onclick="navigateToRoot()">Raiz</span>
+                <span onclick="navigateToRoot()" title="Voltar para a área de trabalho">Área de Trabalho</span>
                 <span id="currentPath"></span>
             </div>
             <div class="content-wrapper">
@@ -32,9 +37,9 @@
                 <ul id="folderList" class="folder-grid"></ul>
             </div>
         </div>
-        
+
         <div id="viewer" class="futuristic-viewer">
-            <button id="closeViewer" class="futuristic-btn"><i class="fas fa-times"></i></button>
+            <button id="closeViewer" class="futuristic-btn" title="Fechar visualização"><i class="fas fa-times"></i></button>
             <img id="imageView" style="display: none;">
             <iframe id="docView" style="display: none;"></iframe>
         </div>
@@ -42,13 +47,44 @@
 
     <div id="modal" class="futuristic-modal">
         <div class="modal-content">
-            <span id="modalClose" class="modal-close">×</span>
+            <span id="modalClose" class="modal-close" title="Fechar">×</span>
             <h2 id="modalTitle"></h2>
             <input type="text" id="modalInput" class="futuristic-input" placeholder="Digite aqui...">
             <div class="modal-buttons">
-                <button id="modalConfirm" class="futuristic-btn">Confirmar</button>
-                <button id="modalCancel" class="futuristic-btn">Cancelar</button>
+                <button id="modalConfirm" class="futuristic-btn" title="Confirmar ação">Confirmar</button>
+                <button id="modalCancel" class="futuristic-btn" title="Cancelar ação">Cancelar</button>
             </div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="futuristic-modal">
+        <div class="modal-content">
+            <span id="confirmModalClose" class="modal-close" title="Fechar">×</span>
+            <h2 id="confirmModalTitle"></h2>
+            <p id="confirmModalMessage"></p>
+            <div class="modal-buttons">
+                <button id="confirmModalYes" class="futuristic-btn" title="Sim, deletar">Sim</button>
+                <button id="confirmModalNo" class="futuristic-btn" title="Não, cancelar">Não</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="helpModal" class="futuristic-modal">
+        <div class="modal-content">
+            <span id="helpModalClose" class="modal-close" title="Fechar">×</span>
+            <h2>Instruções de Uso</h2>
+            <p>
+                - <strong>Upload:</strong> Adicione arquivos à área de trabalho ou pasta aberta.<br>
+                - <strong>Nova Pasta:</strong> Crie e organize arquivos. Abre automaticamente ao confirmar.<br>
+                - <strong>Tema:</strong> Alterne entre claro e escuro.<br>
+                - <strong>Download:</strong> Baixe qualquer arquivo.<br>
+                - <strong>Excluir:</strong> Delete arquivos ou pastas com confirmação.<br>
+                - <strong>Renomear:</strong> Altere nomes de arquivos ou pastas.<br>
+                - <strong>Visualizar:</strong> Veja arquivos na aplicação.<br>
+                - <strong>Arrastar:</strong> Mova arquivos para qualquer pasta.<br>
+                - <strong>Busca:</strong> Pesquise por nome ou ordene por data/nome.<br>
+                - <strong>Navegação:</strong> Clique duas vezes em uma pasta para abri-la ou em "Área de Trabalho" para voltar.
+            </p>
         </div>
     </div>
 
