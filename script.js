@@ -31,25 +31,15 @@ addEventListeners();
 filterFiles();
 
 function addEventListeners() {
-    elements.uploadButton.addEventListener('click', () => {
-        elements.fileInput.click();
-    });
-
+    elements.uploadButton.addEventListener('click', () => elements.fileInput.click());
     elements.fileInput.addEventListener('change', (e) => {
         if (e.target.files && e.target.files.length > 0) {
             handleFiles(e.target.files);
-            e.target.value = ''; // Reset input
+            e.target.value = '';
         }
     });
-
-    elements.createFolderButton.addEventListener('click', () => {
-        showCreateFolderModal();
-    });
-
-    elements.toggleThemeButton.addEventListener('click', () => {
-        toggleTheme();
-    });
-
+    elements.createFolderButton.addEventListener('click', showCreateFolderModal);
+    elements.toggleThemeButton.addEventListener('click', toggleTheme);
     elements.closeViewer.addEventListener('click', closeFileViewer);
     elements.nameFilter.addEventListener('input', filterFiles);
     elements.extFilter.addEventListener('input', filterFiles);
@@ -59,7 +49,6 @@ function addEventListeners() {
     elements.modalCancel.addEventListener('click', closeModal);
     elements.modalConfirm.addEventListener('click', handleModalConfirm);
 
-    // Drag and Drop
     elements.folderList.addEventListener('dragover', (e) => e.preventDefault());
     elements.folderList.addEventListener('drop', handleDrop);
 }
@@ -67,7 +56,8 @@ function addEventListeners() {
 function handleFiles(files) {
     const path = currentPath.join('/');
     const currentDate = new Date().toISOString().split('T')[0];
-    
+    let filesProcessed = 0;
+
     Array.from(files).forEach(file => {
         const fileReader = new FileReader();
         fileReader.onload = (e) => {
@@ -75,12 +65,23 @@ function handleFiles(files) {
                 name: file.name,
                 size: file.size,
                 type: file.name.split('.').pop().toLowerCase(),
-                content: e.target.result, // Armazena o conteúdo como base64
+                content: e.target.result,
                 path: path,
                 date: currentDate
             });
-            saveFiles();
-            filterFiles();
+            filesProcessed++;
+            if (filesProcessed === files.length) {
+                saveFiles();
+                filterFiles();
+            }
+        };
+        fileReader.onerror = () => {
+            console.error(`Erro ao ler o arquivo: ${file.name}`);
+            filesProcessed++;
+            if (filesProcessed === files.length) {
+                saveFiles();
+                filterFiles();
+            }
         };
         fileReader.readAsDataURL(file);
     });
@@ -106,14 +107,15 @@ function filterFiles() {
         const li = document.createElement('li');
         li.draggable = true;
         li.dataset.name = file.name;
+        li.dataset.path = file.path;
         li.className = file.type === 'folder' ? 'folder' : 'file';
         li.innerHTML = `
             <span>${file.name} (${(file.size / 1024).toFixed(2)} KB) - ${file.date}</span>
             <div class="buttons">
-                <button onclick="downloadFile('${file.name}')"><i class="fas fa-download"></i></button>
-                <button onclick="deleteFile('${file.name}')"><i class="fas fa-trash"></i></button>
-                <button onclick="showRenameModal('${file.name}')"><i class="fas fa-edit"></i></button>
-                <button onclick="viewFile('${file.name}')"><i class="fas fa-eye"></i></button>
+                <button onclick="downloadFile('${file.name}', '${file.path}')"><i class="fas fa-download"></i></button>
+                <button onclick="deleteFile('${file.name}', '${file.path}')"><i class="fas fa-trash"></i></button>
+                <button onclick="showRenameModal('${file.name}', '${file.path}')"><i class="fas fa-edit"></i></button>
+                <button onclick="viewFile('${file.name}', '${file.path}')"><i class="fas fa-eye"></i></button>
             </div>
         `;
         
@@ -123,6 +125,7 @@ function filterFiles() {
         } else {
             li.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('text/plain', file.name);
+                e.dataTransfer.setData('path', file.path);
             });
             elements.fileList.appendChild(li);
         }
@@ -133,9 +136,9 @@ function saveFiles() {
     localStorage.setItem('filesArray', JSON.stringify(filesArray));
 }
 
-function downloadFile(fileName) {
-    const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
-    if (!file.content) return;
+function downloadFile(fileName, path) {
+    const file = filesArray.find(f => f.name === fileName && f.path === path);
+    if (!file || !file.content) return;
     const a = document.createElement('a');
     a.href = file.content;
     a.download = file.name;
@@ -144,14 +147,15 @@ function downloadFile(fileName) {
     document.body.removeChild(a);
 }
 
-function deleteFile(fileName) {
-    filesArray = filesArray.filter(f => !(f.name === fileName && f.path === currentPath.join('/')));
+function deleteFile(fileName, path) {
+    filesArray = filesArray.filter(f => !(f.name === fileName && f.path === path));
     saveFiles();
     filterFiles();
 }
 
-function showRenameModal(fileName) {
-    currentFileToRename = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
+function showRenameModal(fileName, path) {
+    currentFileToRename = filesArray.find(f => f.name === fileName && f.path === path);
+    if (!currentFileToRename) return;
     elements.modalTitle.textContent = 'Renomear Arquivo';
     elements.modalInput.value = currentFileToRename.name;
     elements.modal.style.display = 'block';
@@ -202,9 +206,9 @@ function navigateToRoot() {
     filterFiles();
 }
 
-function viewFile(fileName) {
-    const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
-    if (!file.content) return;
+function viewFile(fileName, path) {
+    const file = filesArray.find(f => f.name === fileName && f.path === path);
+    if (!file || !file.content) return;
     
     elements.viewer.style.display = 'flex';
     const fileType = file.type.toLowerCase();
@@ -241,10 +245,11 @@ function updatePathDisplay() {
 function handleDrop(e) {
     e.preventDefault();
     const fileName = e.dataTransfer.getData('text/plain');
+    const oldPath = e.dataTransfer.getData('path');
     const folderName = e.target.closest('.folder')?.dataset.name;
     
     if (folderName) {
-        const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
+        const file = filesArray.find(f => f.name === fileName && f.path === oldPath);
         if (file && file.type !== 'folder') {
             file.path = `${currentPath.join('/')}/${folderName}`.replace('//', '/');
             saveFiles();
