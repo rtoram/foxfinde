@@ -1,3 +1,4 @@
+const uploadButton = document.getElementById('uploadButton');
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
 const fileList = document.getElementById('fileList');
@@ -8,17 +9,7 @@ const createFolderButton = document.getElementById('createFolder');
 let filesArray = [];
 let currentPath = [];
 
-dropzone.addEventListener('click', () => fileInput.click());
-dropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropzone.classList.add('dragover');
-});
-dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
-dropzone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropzone.classList.remove('dragover');
-    handleFiles(e.dataTransfer.files);
-});
+uploadButton.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 createFolderButton.addEventListener('click', createFolder);
 
@@ -50,17 +41,18 @@ function filterFiles() {
 
     filtered.forEach(file => {
         const li = document.createElement('li');
+        li.classList.add(file.type === 'folder' ? 'folder' : 'file');
         li.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
 
         const buttonsDiv = document.createElement('div');
         buttonsDiv.classList.add('buttons');
 
         const downloadButton = document.createElement('button');
-        downloadButton.textContent = 'Download';
+        downloadButton.innerHTML = '⬇️';
         downloadButton.addEventListener('click', () => downloadFile(file));
 
         const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Excluir';
+        deleteButton.innerHTML = '❌';
         deleteButton.addEventListener('click', () => deleteFile(file));
 
         buttonsDiv.appendChild(downloadButton);
