@@ -152,10 +152,14 @@ function viewFile(file) {
     if (fileType === 'jpg' || fileType === 'jpeg' || fileType === 'png' || fileType === 'gif') {
         imageView.src = URL.createObjectURL(file.content);
         imageView.style.display = 'block';
+        imageView.style.maxWidth = '80%';
+        imageView.style.maxHeight = '80%';
         docView.style.display = 'none';
     } else if (fileType === 'pdf' || fileType === 'txt' || fileType === 'doc' || fileType === 'docx') {
         docView.src = URL.createObjectURL(file.content);
         docView.style.display = 'block';
+        docView.style.maxWidth = '80%';
+        docView.style.maxHeight = '80%';
         imageView.style.display = 'none';
     }
 }
