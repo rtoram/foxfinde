@@ -13,8 +13,8 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', Arial, sans-serif;
-    transition: all 0.3s ease;
-    display: flex;
+    display: flex; /* Layout flex para menu vertical */
+    height: 100vh; /* Altura total da tela */
 }
 
 .theme-dark {
@@ -28,15 +28,15 @@ body {
 }
 
 .futuristic-menu {
-    width: 250px;
-    height: 100vh;
+    width: 250px; /* Largura fixa para menu vertical */
+    height: 100%; /* Ocupa toda a altura */
     padding: 20px;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    flex-direction: column; /* Itens alinhados verticalmente */
+    gap: 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .futuristic-btn {
@@ -76,13 +76,14 @@ body {
 }
 
 .futuristic-container {
-    flex: 1;
-    height: 100vh;
+    flex: 1; /* Ocupa o espaço restante */
+    display: flex;
+    flex-direction: column;
 }
 
 .content-wrapper {
     display: flex;
-    width: 100%;
+    flex: 1;
     padding: 20px;
     gap: 20px;
 }
@@ -91,18 +92,10 @@ body {
     list-style: none;
     padding: 0;
     margin: 0;
-}
-
-.file-grid {
     flex: 1;
 }
 
-.folder-grid {
-    flex: 1;
-    order: 2;
-}
-
-.file-grid li, .folder-grid li {
+.file-grid li {
     padding: 15px;
     margin: 10px 0;
     border-radius: 10px;
@@ -115,17 +108,27 @@ body {
 }
 
 .folder-grid li {
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 10px;
     background: rgba(255, 107, 107, 0.2); /* Cor diferente para pastas */
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
 }
 
-.file-grid li:hover, .folder-grid li:hover {
+.file-grid li:hover {
     transform: translateX(5px);
     background: rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
 }
 
 .folder-grid li:hover {
+    transform: translateX(5px);
     background: rgba(255, 107, 107, 0.3);
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
 }
 
 .buttons button {
@@ -193,10 +196,8 @@ body {
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
-    transform: translate(-50%, -50%) scale(0.9);
-    transition: all 0.3s ease;
-}
-
-.futuristic-modal[style*="block"] .modal-content {
-    transform: translate(-50%, -50%) scale(1);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
