@@ -3,29 +3,43 @@ const fileInput = document.getElementById('fileInput');
 const fileList = document.getElementById('fileList');
 const nameFilter = document.getElementById('nameFilter');
 const extFilter = document.getElementById('extFilter');
+const dateFilter = document.getElementById('dateFilter');
 const createFolderButton = document.getElementById('createFolder');
+const toggleThemeButton = document.getElementById('toggleTheme');
 const viewer = document.getElementById('viewer');
 const imageView = document.getElementById('imageView');
 const docView = document.getElementById('docView');
 const closeViewer = document.getElementById('closeViewer');
+const body = document.body;
 
 let filesArray = JSON.parse(localStorage.getItem('filesArray')) || [];
 let currentPath = [];
+let theme = localStorage.getItem('theme') || 'dark';
+
+applyTheme(theme);
 
 uploadButton.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 createFolderButton.addEventListener('click', createFolder);
 closeViewer.addEventListener('click', closeFileViewer);
+toggleThemeButton.addEventListener('click', toggleTheme);
+
+nameFilter.addEventListener('input', filterFiles);
+extFilter.addEventListener('input', filterFiles);
+dateFilter.addEventListener('input', filterFiles);
+window.addEventListener('load', filterFiles);
 
 function handleFiles(files) {
     const path = currentPath.join('/');
+    const currentDate = new Date().toISOString().split('T')[0];
     Array.from(files).forEach(file => {
         filesArray.push({
             name: file.name,
             size: file.size,
             type: file.name.split('.').pop().toLowerCase(),
             content: file,
-            path: path
+            path: path,
+            date: currentDate
         });
     });
     saveFiles();
@@ -35,19 +49,21 @@ function handleFiles(files) {
 function filterFiles() {
     const nameQuery = nameFilter.value.toLowerCase();
     const extQuery = extFilter.value.toLowerCase();
+    const dateQuery = dateFilter.value;
     fileList.innerHTML = '';
 
     const currentFolder = currentPath.join('/');
     const filtered = filesArray.filter(file => 
         file.name.toLowerCase().includes(nameQuery) &&
         (extQuery === '' || file.type === extQuery.replace('.', '')) &&
-        file.path === currentFolder
+        file.path === currentFolder &&
+        (dateQuery === '' || file.date === dateQuery)
     );
 
     filtered.forEach(file => {
         const li = document.createElement('li');
         li.classList.add(file.type === 'folder' ? 'folder' : 'file');
-        li.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+        li.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB) - ${file.date}`;
 
         const buttonsDiv = document.createElement('div');
         buttonsDiv.classList.add('buttons');
@@ -116,7 +132,8 @@ function createFolder() {
         filesArray.push({
             name: folderName,
             type: 'folder',
-            path: path
+            path: path,
+            date: new Date().toISOString().split('T')[0]
         });
         saveFiles();
         filterFiles();
@@ -147,6 +164,12 @@ function closeFileViewer() {
     viewer.style.display = 'none';
 }
 
-nameFilter.addEventListener('input', filterFiles);
-extFilter.addEventListener('input', filterFiles);
-window.addEventListener('load', filterFiles);
+function toggleTheme() {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('theme', theme);
+    applyTheme(theme);
+}
+
+function applyTheme(theme) {
+    body.className = theme === 'dark' ? 'theme-dark' : 'theme-light';
+}
