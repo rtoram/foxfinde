@@ -23,7 +23,8 @@ function handleFiles(files) {
     filesArray = Array.from(files).map(file => ({
         name: file.name,
         size: file.size,
-        type: file.name.split('.').pop().toLowerCase()
+        type: file.name.split('.').pop().toLowerCase(),
+        content: file
     }));
     filterFiles();
 }
@@ -41,8 +42,33 @@ function filterFiles() {
     filtered.forEach(file => {
         const li = document.createElement('li');
         li.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+
+        const downloadButton = document.createElement('button');
+        downloadButton.textContent = 'Download';
+        downloadButton.addEventListener('click', () => downloadFile(file));
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Excluir';
+        deleteButton.addEventListener('click', () => deleteFile(file));
+
+        li.appendChild(downloadButton);
+        li.appendChild(deleteButton);
         fileList.appendChild(li);
     });
+}
+
+function downloadFile(file) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file.content);
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+function deleteFile(file) {
+    filesArray = filesArray.filter(f => f !== file);
+    filterFiles();
 }
 
 nameFilter.addEventListener('input', filterFiles);
