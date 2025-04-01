@@ -3,8 +3,10 @@ const fileInput = document.getElementById('fileInput');
 const fileList = document.getElementById('fileList');
 const nameFilter = document.getElementById('nameFilter');
 const extFilter = document.getElementById('extFilter');
+const createFolderButton = document.getElementById('createFolder');
 
 let filesArray = [];
+let currentPath = [];
 
 dropzone.addEventListener('click', () => fileInput.click());
 dropzone.addEventListener('dragover', (e) => {
@@ -18,14 +20,19 @@ dropzone.addEventListener('drop', (e) => {
     handleFiles(e.dataTransfer.files);
 });
 fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+createFolderButton.addEventListener('click', createFolder);
 
 function handleFiles(files) {
-    filesArray = Array.from(files).map(file => ({
-        name: file.name,
-        size: file.size,
-        type: file.name.split('.').pop().toLowerCase(),
-        content: file
-    }));
+    const path = currentPath.join('/');
+    Array.from(files).forEach(file => {
+        filesArray.push({
+            name: file.name,
+            size: file.size,
+            type: file.name.split('.').pop().toLowerCase(),
+            content: file,
+            path: path
+        });
+    });
     filterFiles();
 }
 
@@ -34,9 +41,11 @@ function filterFiles() {
     const extQuery = extFilter.value.toLowerCase();
     fileList.innerHTML = '';
 
+    const currentFolder = currentPath.join('/');
     const filtered = filesArray.filter(file => 
         file.name.toLowerCase().includes(nameQuery) &&
-        (extQuery === '' || file.type === extQuery.replace('.', ''))
+        (extQuery === '' || file.type === extQuery.replace('.', '')) &&
+        file.path === currentFolder
     );
 
     filtered.forEach(file => {
@@ -55,6 +64,19 @@ function filterFiles() {
         li.appendChild(deleteButton);
         fileList.appendChild(li);
     });
+
+    // Adicionar pastas
+    const folders = filesArray
+        .filter(file => file.type === 'folder' && file.path === currentFolder)
+        .map(file => file.name);
+    
+    folders.forEach(folder => {
+        const li = document.createElement('li');
+        li.textContent = folder;
+        li.classList.add('folder');
+        li.addEventListener('click', () => navigateToFolder(folder));
+        fileList.appendChild(li);
+    });
 }
 
 function downloadFile(file) {
@@ -68,6 +90,24 @@ function downloadFile(file) {
 
 function deleteFile(file) {
     filesArray = filesArray.filter(f => f !== file);
+    filterFiles();
+}
+
+function createFolder() {
+    const folderName = prompt('Nome da nova pasta:');
+    if (folderName) {
+        const path = currentPath.join('/');
+        filesArray.push({
+            name: folderName,
+            type: 'folder',
+            path: path
+        });
+        filterFiles();
+    }
+}
+
+function navigateToFolder(folder) {
+    currentPath.push(folder);
     filterFiles();
 }
 
