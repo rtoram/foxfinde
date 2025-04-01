@@ -112,10 +112,10 @@ function filterFiles() {
         li.innerHTML = `
             <span>${file.name} (${(file.size / 1024).toFixed(2)} KB) - ${file.date}</span>
             <div class="buttons">
-                <button onclick="downloadFile('${file.name}', '${file.path}')"><i class="fas fa-download"></i></button>
-                <button onclick="deleteFile('${file.name}', '${file.path}')"><i class="fas fa-trash"></i></button>
-                <button onclick="showRenameModal('${file.name}', '${file.path}')"><i class="fas fa-edit"></i></button>
-                <button onclick="viewFile('${file.name}', '${file.path}')"><i class="fas fa-eye"></i></button>
+                <button class="download-btn" data-name="${file.name}" data-path="${file.path}"><i class="fas fa-download"></i></button>
+                <button class="delete-btn" data-name="${file.name}" data-path="${file.path}"><i class="fas fa-trash"></i></button>
+                <button class="rename-btn" data-name="${file.name}" data-path="${file.path}"><i class="fas fa-edit"></i></button>
+                <button class="view-btn" data-name="${file.name}" data-path="${file.path}"><i class="fas fa-eye"></i></button>
             </div>
         `;
         
@@ -129,6 +129,11 @@ function filterFiles() {
             });
             elements.fileList.appendChild(li);
         }
+
+        li.querySelector('.download-btn').addEventListener('click', () => downloadFile(file.name, file.path));
+        li.querySelector('.delete-btn').addEventListener('click', () => deleteFile(file.name, file.path));
+        li.querySelector('.rename-btn').addEventListener('click', () => showRenameModal(file.name, file.path));
+        li.querySelector('.view-btn').addEventListener('click', () => viewFile(file.name, file.path));
     });
 }
 
