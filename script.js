@@ -31,11 +31,26 @@ addEventListeners();
 filterFiles();
 
 function addEventListeners() {
-    elements.uploadButton.addEventListener('click', () => elements.fileInput.click());
-    elements.fileInput.addEventListener('change', () => handleFiles(elements.fileInput.files));
-    elements.createFolderButton.addEventListener('click', showCreateFolderModal);
+    elements.uploadButton.addEventListener('click', () => {
+        elements.fileInput.click();
+    });
+
+    elements.fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            handleFiles(e.target.files);
+            e.target.value = ''; // Reset input
+        }
+    });
+
+    elements.createFolderButton.addEventListener('click', () => {
+        showCreateFolderModal();
+    });
+
+    elements.toggleThemeButton.addEventListener('click', () => {
+        toggleTheme();
+    });
+
     elements.closeViewer.addEventListener('click', closeFileViewer);
-    elements.toggleThemeButton.addEventListener('click', toggleTheme);
     elements.nameFilter.addEventListener('input', filterFiles);
     elements.extFilter.addEventListener('input', filterFiles);
     elements.dateFilter.addEventListener('input', filterFiles);
@@ -54,17 +69,21 @@ function handleFiles(files) {
     const currentDate = new Date().toISOString().split('T')[0];
     
     Array.from(files).forEach(file => {
-        filesArray.push({
-            name: file.name,
-            size: file.size,
-            type: file.name.split('.').pop().toLowerCase(),
-            content: file,
-            path: path,
-            date: currentDate
-        });
+        const fileReader = new FileReader();
+        fileReader.onload = (e) => {
+            filesArray.push({
+                name: file.name,
+                size: file.size,
+                type: file.name.split('.').pop().toLowerCase(),
+                content: e.target.result, // Armazena o conteúdo como base64
+                path: path,
+                date: currentDate
+            });
+            saveFiles();
+            filterFiles();
+        };
+        fileReader.readAsDataURL(file);
     });
-    saveFiles();
-    filterFiles();
 }
 
 function filterFiles() {
@@ -110,6 +129,115 @@ function filterFiles() {
     });
 }
 
+function saveFiles() {
+    localStorage.setItem('filesArray', JSON.stringify(filesArray));
+}
+
+function downloadFile(fileName) {
+    const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
+    if (!file.content) return;
+    const a = document.createElement('a');
+    a.href = file.content;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+function deleteFile(fileName) {
+    filesArray = filesArray.filter(f => !(f.name === fileName && f.path === currentPath.join('/')));
+    saveFiles();
+    filterFiles();
+}
+
+function showRenameModal(fileName) {
+    currentFileToRename = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
+    elements.modalTitle.textContent = 'Renomear Arquivo';
+    elements.modalInput.value = currentFileToRename.name;
+    elements.modal.style.display = 'block';
+}
+
+function showCreateFolderModal() {
+    currentFileToRename = null;
+    elements.modalTitle.textContent = 'Nova Pasta';
+    elements.modalInput.value = '';
+    elements.modal.style.display = 'block';
+}
+
+function handleModalConfirm() {
+    const newName = elements.modalInput.value.trim();
+    if (!newName) return;
+
+    if (currentFileToRename) {
+        currentFileToRename.name = newName;
+    } else {
+        const path = currentPath.join('/');
+        filesArray.push({
+            name: newName,
+            type: 'folder',
+            path: path,
+            date: new Date().toISOString().split('T')[0],
+            size: 0
+        });
+    }
+    
+    saveFiles();
+    filterFiles();
+    closeModal();
+}
+
+function closeModal() {
+    elements.modal.style.display = 'none';
+    elements.modalInput.value = '';
+    currentFileToRename = null;
+}
+
+function navigateToFolder(folder) {
+    currentPath.push(folder.name);
+    filterFiles();
+}
+
+function navigateToRoot() {
+    currentPath = [];
+    filterFiles();
+}
+
+function viewFile(fileName) {
+    const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
+    if (!file.content) return;
+    
+    elements.viewer.style.display = 'flex';
+    const fileType = file.type.toLowerCase();
+
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+        elements.imageView.src = file.content;
+        elements.imageView.style.display = 'block';
+        elements.docView.style.display = 'none';
+    } else if (['pdf', 'txt', 'doc', 'docx'].includes(fileType)) {
+        elements.docView.src = file.content;
+        elements.docView.style.display = 'block';
+        elements.imageView.style.display = 'none';
+    }
+}
+
+function closeFileViewer() {
+    elements.viewer.style.display = 'none';
+    elements.imageView.style.display = 'none';
+    elements.docView.style.display = 'none';
+}
+
+function toggleTheme() {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('theme', theme);
+    document.body.className = `theme-${theme}`;
+}
+
+function updatePathDisplay() {
+    elements.currentPathSpan.innerHTML = currentPath.map(p => 
+        `<span>${p}</span>`
+    ).join(' / ');
+}
+
 function handleDrop(e) {
     e.preventDefault();
     const fileName = e.dataTransfer.getData('text/plain');
@@ -124,5 +252,3 @@ function handleDrop(e) {
         }
     }
 }
-
-// ... (manter as outras funções como estão: saveFiles, downloadFile, etc.) ...
