@@ -5,12 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XperiArquivos</title>
     <style>
-        /* Adicionar estilos básicos */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
         #dropzone {
             border: 2px dashed #ccc;
             padding: 20px;
             text-align: center;
             margin-bottom: 20px;
+            background-color: #fff;
+            cursor: pointer;
         }
         .dragover {
             border-color: #000;
@@ -20,10 +30,26 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+        #fileList li .buttons {
+            display: flex;
+            gap: 10px;
         }
         .folder {
             font-weight: bold;
             cursor: pointer;
+        }
+        #controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #controls input, #controls button {
+            padding: 10px;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -31,9 +57,11 @@
     <h1>XperiArquivos</h1>
     <div id="dropzone">Arraste e solte arquivos aqui ou clique para selecionar</div>
     <input type="file" id="fileInput" multiple style="display:none">
-    <input type="text" id="nameFilter" placeholder="Filtrar por nome">
-    <input type="text" id="extFilter" placeholder="Filtrar por extensão">
-    <button id="createFolder">Criar Pasta</button>
+    <div id="controls">
+        <input type="text" id="nameFilter" placeholder="Filtrar por nome">
+        <input type="text" id="extFilter" placeholder="Filtrar por extensão">
+        <button id="createFolder">Criar Pasta</button>
+    </div>
     <ul id="fileList"></ul>
 </body>
 </html>
