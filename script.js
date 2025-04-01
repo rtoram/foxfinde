@@ -1,37 +1,42 @@
-const uploadButton = document.getElementById('uploadButton');
-const fileInput = document.getElementById('fileInput');
-const fileList = document.getElementById('fileList');
-const nameFilter = document.getElementById('nameFilter');
-const extFilter = document.getElementById('extFilter');
-const dateFilter = document.getElementById('dateFilter');
-const createFolderButton = document.getElementById('createFolder');
-const toggleThemeButton = document.getElementById('toggleTheme');
-const viewer = document.getElementById('viewer');
-const imageView = document.getElementById('imageView');
-const docView = document.getElementById('docView');
-const closeViewer = document.getElementById('closeViewer');
-const body = document.body;
+const elements = {
+    uploadButton: document.getElementById('uploadButton'),
+    fileInput: document.getElementById('fileInput'),
+    fileList: document.getElementById('fileList'),
+    nameFilter: document.getElementById('nameFilter'),
+    extFilter: document.getElementById('extFilter'),
+    dateFilter: document.getElementById('dateFilter'),
+    createFolderButton: document.getElementById('createFolder'),
+    toggleThemeButton: document.getElementById('toggleTheme'),
+    viewer: document.getElementById('viewer'),
+    imageView: document.getElementById('imageView'),
+    docView: document.getElementById('docView'),
+    closeViewer: document.getElementById('closeViewer'),
+    currentPathSpan: document.getElementById('currentPath')
+};
 
 let filesArray = JSON.parse(localStorage.getItem('filesArray')) || [];
 let currentPath = [];
 let theme = localStorage.getItem('theme') || 'dark';
 
-applyTheme(theme);
+document.body.className = `theme-${theme}`;
+addEventListeners();
+filterFiles();
 
-uploadButton.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', () => handleFiles(fileInput.files));
-createFolderButton.addEventListener('click', createFolder);
-closeViewer.addEventListener('click', closeFileViewer);
-toggleThemeButton.addEventListener('click', toggleTheme);
-
-nameFilter.addEventListener('input', filterFiles);
-extFilter.addEventListener('input', filterFiles);
-dateFilter.addEventListener('input', filterFiles);
-window.addEventListener('load', filterFiles);
+function addEventListeners() {
+    elements.uploadButton.addEventListener('click', () => elements.fileInput.click());
+    elements.fileInput.addEventListener('change', () => handleFiles(elements.fileInput.files));
+    elements.createFolderButton.addEventListener('click', createFolder);
+    elements.closeViewer.addEventListener('click', closeFileViewer);
+    elements.toggleThemeButton.addEventListener('click', toggleTheme);
+    elements.nameFilter.addEventListener('input', filterFiles);
+    elements.extFilter.addEventListener('input', filterFiles);
+    elements.dateFilter.addEventListener('input', filterFiles);
+}
 
 function handleFiles(files) {
     const path = currentPath.join('/');
     const currentDate = new Date().toISOString().split('T')[0];
+    
     Array.from(files).forEach(file => {
         filesArray.push({
             name: file.name,
@@ -47,53 +52,36 @@ function handleFiles(files) {
 }
 
 function filterFiles() {
-    const nameQuery = nameFilter.value.toLowerCase();
-    const extQuery = extFilter.value.toLowerCase();
-    const dateQuery = dateFilter.value;
-    fileList.innerHTML = '';
+    const nameQuery = elements.nameFilter.value.toLowerCase();
+    const extQuery = elements.extFilter.value.toLowerCase().replace('.', '');
+    const dateQuery = elements.dateFilter.value;
+    elements.fileList.innerHTML = '';
+    updatePathDisplay();
 
     const currentFolder = currentPath.join('/');
     const filtered = filesArray.filter(file => 
         file.name.toLowerCase().includes(nameQuery) &&
-        (extQuery === '' || file.type === extQuery.replace('.', '')) &&
+        (extQuery === '' || file.type === extQuery) &&
         file.path === currentFolder &&
         (dateQuery === '' || file.date === dateQuery)
     );
 
     filtered.forEach(file => {
         const li = document.createElement('li');
-        li.classList.add(file.type === 'folder' ? 'folder' : 'file');
-        li.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB) - ${file.date}`;
-
-        const buttonsDiv = document.createElement('div');
-        buttonsDiv.classList.add('buttons');
-
-        const downloadButton = document.createElement('button');
-        downloadButton.innerHTML = 'D';
-        downloadButton.addEventListener('click', () => downloadFile(file));
-
-        const deleteButton = document.createElement('button');
-        deleteButton.innerHTML = '❌';
-        deleteButton.addEventListener('click', () => deleteFile(file));
-
-        const renameButton = document.createElement('button');
-        renameButton.innerHTML = '✏️';
-        renameButton.addEventListener('click', () => renameFile(file));
-
-        const viewButton = document.createElement('button');
-        viewButton.innerHTML = '🔍';
-        viewButton.addEventListener('click', () => viewFile(file));
-
-        buttonsDiv.appendChild(downloadButton);
-        buttonsDiv.appendChild(deleteButton);
-        buttonsDiv.appendChild(renameButton);
-        buttonsDiv.appendChild(viewButton);
-        li.appendChild(buttonsDiv);
-        fileList.appendChild(li);
-
+        li.className = file.type === 'folder' ? 'folder' : 'file';
+        li.innerHTML = `
+            <span>${file.name} (${(file.size / 1024).toFixed(2)} KB) - ${file.date}</span>
+            <div class="buttons">
+                <button onclick="downloadFile('${file.name}')"><i class="fas fa-download"></i></button>
+                <button onclick="deleteFile('${file.name}')"><i class="fas fa-trash"></i></button>
+                <button onclick="renameFile('${file.name}')"><i class="fas fa-edit"></i></button>
+                <button onclick="viewFile('${file.name}')"><i class="fas fa-eye"></i></button>
+            </div>
+        `;
         if (file.type === 'folder') {
             li.addEventListener('dblclick', () => navigateToFolder(file));
         }
+        elements.fileList.appendChild(li);
     });
 }
 
@@ -101,7 +89,9 @@ function saveFiles() {
     localStorage.setItem('filesArray', JSON.stringify(filesArray));
 }
 
-function downloadFile(file) {
+function downloadFile(fileName) {
+    const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
+    if (!file.content) return;
     const a = document.createElement('a');
     a.href = URL.createObjectURL(file.content);
     a.download = file.name;
@@ -110,13 +100,14 @@ function downloadFile(file) {
     document.body.removeChild(a);
 }
 
-function deleteFile(file) {
-    filesArray = filesArray.filter(f => f !== file);
+function deleteFile(fileName) {
+    filesArray = filesArray.filter(f => !(f.name === fileName && f.path === currentPath.join('/')));
     saveFiles();
     filterFiles();
 }
 
-function renameFile(file) {
+function renameFile(fileName) {
+    const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
     const newName = prompt('Novo nome:', file.name);
     if (newName) {
         file.name = newName;
@@ -133,7 +124,8 @@ function createFolder() {
             name: folderName,
             type: 'folder',
             path: path,
-            date: new Date().toISOString().split('T')[0]
+            date: new Date().toISOString().split('T')[0],
+            size: 0
         });
         saveFiles();
         filterFiles();
@@ -145,35 +137,43 @@ function navigateToFolder(folder) {
     filterFiles();
 }
 
-function viewFile(file) {
-    const fileType = file.type.toLowerCase();
-    viewer.style.display = 'block';
+function navigateToRoot() {
+    currentPath = [];
+    filterFiles();
+}
 
-    if (fileType === 'jpg' || fileType === 'jpeg' || fileType === 'png' || fileType === 'gif') {
-        imageView.src = URL.createObjectURL(file.content);
-        imageView.style.display = 'block';
-        imageView.style.maxWidth = '80%';
-        imageView.style.maxHeight = '80%';
-        docView.style.display = 'none';
-    } else if (fileType === 'pdf' || fileType === 'txt' || fileType === 'doc' || fileType === 'docx') {
-        docView.src = URL.createObjectURL(file.content);
-        docView.style.display = 'block';
-        docView.style.maxWidth = '80%';
-        docView.style.maxHeight = '80%';
-        imageView.style.display = 'none';
+function viewFile(fileName) {
+    const file = filesArray.find(f => f.name === fileName && f.path === currentPath.join('/'));
+    if (!file.content) return;
+    
+    elements.viewer.style.display = 'flex';
+    const fileType = file.type.toLowerCase();
+
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+        elements.imageView.src = URL.createObjectURL(file.content);
+        elements.imageView.style.display = 'block';
+        elements.docView.style.display = 'none';
+    } else if (['pdf', 'txt', 'doc', 'docx'].includes(fileType)) {
+        elements.docView.src = URL.createObjectURL(file.content);
+        elements.docView.style.display = 'block';
+        elements.imageView.style.display = 'none';
     }
 }
 
 function closeFileViewer() {
-    viewer.style.display = 'none';
+    elements.viewer.style.display = 'none';
+    elements.imageView.style.display = 'none';
+    elements.docView.style.display = 'none';
 }
 
 function toggleTheme() {
     theme = theme === 'dark' ? 'light' : 'dark';
     localStorage.setItem('theme', theme);
-    applyTheme(theme);
+    document.body.className = `theme-${theme}`;
 }
 
-function applyTheme(theme) {
-    body.className = theme === 'dark' ? 'theme-dark' : 'theme-light';
+function updatePathDisplay() {
+    elements.currentPathSpan.innerHTML = currentPath.map(p => 
+        `<span>${p}</span>`
+    ).join(' / ');
 }
